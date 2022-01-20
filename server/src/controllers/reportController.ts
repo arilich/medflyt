@@ -22,6 +22,7 @@ export const getReport = async (req: Request, res: Response) => {
         FROM caregiver
         JOIN visit ON visit.caregiver = caregiver.id
         JOIN patient ON patient.id = visit.patient
+        WHERE visit.date >= '${req.params.year}-01-01' AND visit.date < '${req.params.year}-12-31'
     `;
     
     let result : QueryResult;
@@ -32,12 +33,15 @@ export const getReport = async (req: Request, res: Response) => {
             caregivers: []
         };
 
-        for ( let row of result.rows) {
-            report.caregivers.push({
-                name: row.caregiver_name,
-                patients: [row.patient_name]
-            })
-        }
+        report.caregivers = Object.values(result.rows.reduce((acc, row) => {
+            const { caregiver_name, patient_name } = row;
+            if (!acc[caregiver_name]) {
+                acc[caregiver_name] = {name: caregiver_name, patients: []};
+            }
+            acc[caregiver_name].patients = acc[caregiver_name].patients.concat(patient_name);
+            return acc;
+        }, {}))
+
         res.status(200).json(report);
     } catch (error) {
         throw new Error(error.message);
