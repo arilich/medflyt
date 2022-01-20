@@ -34,6 +34,12 @@ const StyledTableView = styled.div`
     gap: 16px;
 `;
 
+const LeftBottom = styled.div`
+    position: fixed;
+    left: 0;
+    bottom: 0;
+`
+
 const { Table, Tr, Th, Td } = TableBlocks;
 
 const TableView = (props: Props) => {
@@ -41,11 +47,10 @@ const TableView = (props: Props) => {
         <StyledTableView>
             <RefreshIndicator isRefreshing={props.isRefreshing} />
             <Header>
-                <MedFlytLogo />
                 <PrimaryText>Year {props.report.year} - caregivers report</PrimaryText>
             </Header>
             <Row justifyContent="flex-end">
-                <Button>
+                <Button onClick={() => window.location.reload()}>
                     <RefreshIcon />
                     <span>Refresh</span>
                 </Button>
@@ -63,7 +68,7 @@ const TableView = (props: Props) => {
                             <Td>{caregiver.name}</Td>
                             <Td>
                                 {caregiver.patients.length > 0 ? (
-                                    caregiver.patients
+                                    caregiver.patients.join(', ')
                                 ) : (
                                     <None />
                                 )}
@@ -79,6 +84,9 @@ const TableView = (props: Props) => {
                     </tbody>
                 ) : null}
             </Table>
+            <LeftBottom>
+                <MedFlytLogo />
+            </LeftBottom>
         </StyledTableView>
     );
 };
